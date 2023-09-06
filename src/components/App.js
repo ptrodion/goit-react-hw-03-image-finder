@@ -7,6 +7,8 @@ import { ImageGallery } from './ImageGallery/ImageGallery';
 import { LoadMoreButton } from './LoadMoreButton/LoadMoreButton';
 import { fetchImages } from './Api/api';
 import { Loader } from './Loader/Loader';
+import { Error } from './Error/Error';
+import { Modal } from './Modal/Modal';
 
 export class App extends Component {
   state = {
@@ -15,6 +17,8 @@ export class App extends Component {
     page: 0,
     loading: false,
     error: false,
+    showModal: false,
+    largePhotoURL: '',
   };
 
   loadMoreButtonRef = React.createRef();
@@ -34,8 +38,16 @@ export class App extends Component {
           const response = await fetchImages(currentQuery, page);
 
           const { totalHits: totalImages, hits: data } = response;
-          // Якщо нічого не прийщло.
+
+          //Якщо немає більше фоток, спрячемо кнопку "LoadMoreButton"
+          // if (totalImages - page * 487 < 12) {
+          //   this.setState({
+          //     showLoadMoreButton: false,
+          //   });
+          // }
+
           if (totalImages === 0) {
+            // Якщо нічого не прийщло.
             toast.error('Nothing found for this query.');
             this.setState({
               images: [],
@@ -80,6 +92,22 @@ export class App extends Component {
     }
   };
 
+  handlerOpenModal = () => {
+    this.setState({
+      showModal: true,
+    });
+  };
+
+  handlerCloseModal = () => {
+    this.setState({
+      showModal: false,
+    });
+  };
+
+  handlerGetLargePhotoURL = value => {
+    this.setState({ largePhotoURL: value });
+  };
+
   handlerLoadMore = () => {
     this.setState(
       prevState => ({
@@ -105,24 +133,34 @@ export class App extends Component {
   };
 
   render() {
-    const { images, loading, error } = this.state;
+    const { images, loading, error, showModal } = this.state;
 
     return (
       <Layout>
         <Searchbar onSearch={this.handlerSearchImages} />
         {this.state.page === 0 && loading && <Loader />}
 
-        {error && !loading && <div>MISTAKE</div>}
+        {error && <Error message={'What went wrong, try again.'} />}
 
         {images.length > 0 && (
           <>
-            <ImageGallery images={this.state.images} />
+            <ImageGallery
+              images={this.state.images}
+              handlerGetLargePhotoURL={this.handlerGetLargePhotoURL}
+              handlerOpenModal={this.handlerOpenModal}
+            />
             <LoadMoreButton
               clickLoadMore={this.handlerLoadMore}
               ref={this.loadMoreButtonRef}
               loading={this.state.loading}
             />
           </>
+        )}
+        {this.state.showModal && (
+          <Modal
+            largePhotoURL={this.state.largePhotoURL}
+            onCloseModal={this.handlerCloseModal}
+          />
         )}
         <GlobalStyle />
         <Toaster position="top-right" reverseOrder={false} />
