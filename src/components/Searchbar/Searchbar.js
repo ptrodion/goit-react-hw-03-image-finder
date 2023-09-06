@@ -1,4 +1,4 @@
-import { Formik, Form } from 'formik';
+import { Formik } from 'formik';
 import {
   InputStyled,
   ButtonStyled,

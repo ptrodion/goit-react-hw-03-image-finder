@@ -105,7 +105,7 @@ export class App extends Component {
         <Searchbar onSearch={this.handlerSearchImages} />
         {loading && <Loader />}
 
-        {/* {error && !loading && <div>MISTAKE</div>} */}
+        {error && !loading && <div>MISTAKE</div>}
 
         {images.length > 0 && (
           <>
