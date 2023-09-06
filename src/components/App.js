@@ -92,7 +92,7 @@ export class App extends Component {
             top: document.documentElement.scrollHeight,
             behavior: 'smooth',
           });
-        }, 650);
+        }, 1000);
       }
     );
   };
