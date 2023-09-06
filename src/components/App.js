@@ -133,32 +133,33 @@ export class App extends Component {
   };
 
   render() {
-    const { images, loading, error, showModal } = this.state;
+    const { images, page, loading, error, showModal, largePhotoURL } =
+      this.state;
 
     return (
       <Layout>
         <Searchbar onSearch={this.handlerSearchImages} />
-        {this.state.page === 0 && loading && <Loader />}
+        {page === 0 && loading && <Loader />}
 
         {error && <Error message={'What went wrong, try again.'} />}
 
         {images.length > 0 && (
           <>
             <ImageGallery
-              images={this.state.images}
+              images={images}
               handlerGetLargePhotoURL={this.handlerGetLargePhotoURL}
               handlerOpenModal={this.handlerOpenModal}
             />
             <LoadMoreButton
               clickLoadMore={this.handlerLoadMore}
               ref={this.loadMoreButtonRef}
-              loading={this.state.loading}
+              loading={loading}
             />
           </>
         )}
-        {this.state.showModal && (
+        {showModal && (
           <Modal
-            largePhotoURL={this.state.largePhotoURL}
+            largePhotoURL={largePhotoURL}
             onCloseModal={this.handlerCloseModal}
           />
         )}
