@@ -15,45 +15,44 @@ export class App extends Component {
     page: 0,
     loading: false,
     error: false,
-    loadMoreButtonRef: React.createRef(),
   };
+
+  loadMoreButtonRef = React.createRef();
 
   async componentDidUpdate(prevProps, prevState) {
     const { query, page } = this.state;
     const currentQuery = String(query.split('/')[1]);
 
+    if (!query) {
+      return;
+    }
     if (prevState.query !== query || prevState.page !== page) {
-      if (query) {
-        this.setState({ loading: true, error: false });
+      this.setState({ loading: true, error: false });
 
-        setTimeout(async () => {
-          try {
-            const response = await fetchImages(currentQuery, page);
+      setTimeout(async () => {
+        try {
+          const response = await fetchImages(currentQuery, page);
 
-            const { totalHits: totalImages, hits: data } = response;
-            if (totalImages === 0) {
-              toast.error('Nothing found for this query.');
-              this.setState({
-                images: [],
-                query: '',
-              });
-            }
-
+          const { totalHits: totalImages, hits: data } = response;
+          // Якщо нічого не прийщло.
+          if (totalImages === 0) {
+            toast.error('Nothing found for this query.');
+            this.setState({
+              images: [],
+              query: '',
+            });
+            // Якщо є то треба додати в массив.
+          } else {
             this.setState(prevState => ({
               images: [...prevState.images, ...data],
             }));
-          } catch (error) {
-            this.setState({ error: true });
-          } finally {
-            this.setState({ loading: false, showLoadMore: false });
           }
-        }, 600);
-      } else {
-        this.setState({
-          images: [],
-          page: 0,
-        });
-      }
+        } catch (error) {
+          this.setState({ error: true });
+        } finally {
+          this.setState({ loading: false });
+        }
+      }, 600);
     }
   }
 
@@ -61,12 +60,13 @@ export class App extends Component {
     if (query) {
       this.setState({
         query: `${Date.now()}/${query}`,
-        images: [],
         page: 1,
       });
     } else {
       this.setState({
         query: '',
+        page: 0,
+        images: [],
       });
 
       toast('Fill in the search word', {
@@ -87,14 +87,21 @@ export class App extends Component {
       }),
 
       () => {
-        setTimeout(() => {
-          window.scrollTo({
-            top: document.documentElement.scrollHeight,
-            behavior: 'smooth',
-          });
-        }, 1000);
+        this.scrollToLoadMoreButton();
       }
     );
+  };
+
+  scrollToLoadMoreButton = () => {
+    if (this.loadMoreButtonRef.current) {
+      setTimeout(() => {
+        window.scrollTo({
+          top: this.loadMoreButtonRef.current.offsetTop,
+
+          behavior: 'smooth',
+        });
+      }, 1000);
+    }
   };
 
   render() {
@@ -103,7 +110,7 @@ export class App extends Component {
     return (
       <Layout>
         <Searchbar onSearch={this.handlerSearchImages} />
-        {loading && <Loader />}
+        {this.state.page === 0 && loading && <Loader />}
 
         {error && !loading && <div>MISTAKE</div>}
 
@@ -112,7 +119,7 @@ export class App extends Component {
             <ImageGallery images={this.state.images} />
             <LoadMoreButton
               clickLoadMore={this.handlerLoadMore}
-              ref={this.state.loadMoreButtonRef}
+              ref={this.loadMoreButtonRef}
               loading={this.state.loading}
             />
           </>
