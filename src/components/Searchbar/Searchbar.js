@@ -25,7 +25,7 @@ export const Searchbar = ({ onSearch }) => {
           <InputStyled
             name="query"
             type="text"
-            // autocomplete="off"
+            autocomplete="off"
             placeholder="Search images and photos"
           />
         </SearchForm>
