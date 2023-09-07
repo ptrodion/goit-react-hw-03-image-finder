@@ -19,6 +19,7 @@ export class App extends Component {
     error: false,
     showModal: false,
     largePhotoURL: '',
+    // showLoadMoreButton: true,
   };
 
   loadMoreButtonRef = React.createRef();
@@ -39,7 +40,7 @@ export class App extends Component {
 
           const { totalHits: totalImages, hits: data } = response;
 
-          //Якщо немає більше фоток, спрячемо кнопку "LoadMoreButton"
+          // Якщо немає більше фоток, спрячемо кнопку "LoadMoreButton"
           // if (totalImages - page * 487 < 12) {
           //   this.setState({
           //     showLoadMoreButton: false,
@@ -73,6 +74,7 @@ export class App extends Component {
       this.setState({
         query: `${Date.now()}/${query}`,
         page: 1,
+        images: [],
       });
     } else {
       this.setState({
@@ -125,7 +127,6 @@ export class App extends Component {
       setTimeout(() => {
         window.scrollTo({
           top: this.loadMoreButtonRef.current.offsetTop,
-
           behavior: 'smooth',
         });
       }, 1000);
